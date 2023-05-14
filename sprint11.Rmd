@@ -1,0 +1,87 @@
+---
+title: "sprint"
+output: html_document
+date: "2023-02-03"
+---
+
+
+```{r}
+
+sprint11 <- read.delim("/Users/anasali/Desktop/Speciale /sprint data/sprint11b.txt", header = TRUE, sep = ",")
+
+library(dplyr)
+#creates the interval splits
+sprint11 <- sprint11 %>% 
+mutate(interval = cut(as.numeric(Resultat), breaks = seq(10.00, 30, by = 0.1), include.lowest = FALSE)) %>% 
+  count(interval) 
+colnames(sprint11)[2] <- "sprinter_count"
+
+#modify the interval column
+sprint11$interval <- as.character(sprint11$interval)
+sprint11$interval <- gsub("\\(|\\]", "", sprint11$interval)
+sprint11$interval <- stringr::str_replace_all(sprint11$interval, "[\\(\\),]", "-")
+
+#categories
+sprint11 <- sprint11 %>% 
+  mutate(category = ifelse(interval < 11, "10 second sprinters", NA),
+         category = ifelse(interval >= 11, "11 second sprinters", category),
+         category = ifelse(interval >= 12, "12 second sprinters", category),
+         category = ifelse(interval >= 13, "13 second sprinters", category),
+         category = ifelse(interval >= 14, "14 second sprinters", category),
+         category = ifelse(interval >= 15, "15 second sprinters", category),
+         category = ifelse(interval >= 16, "16 second sprinters", category),
+         category = ifelse(interval >= 17, "17 second sprinters", category),
+         category = ifelse(interval >= 18, "18 second sprinters", category),
+         category = ifelse(interval >= 19, "19 second sprinters", category),
+         category = ifelse(interval >= 20, "+20 second sprinters", category))
+
+sprint11 <- na.omit(sprint11)
+```
+
+#Visualizing:
+```{r}
+library(ggplot2)
+
+# Create a bar plot with sprinter count on the y-axis and interval on the x-axis
+ggplot(sprint11, aes(x = interval, y = sprinter_count, fill = category)) +
+  geom_col() +
+  labs(x = "Interval (seconds)", y = "Sprinters", fill = "Category") +
+  ggtitle("Sprinter count per interval")
+```
+
+#Bootstrapping
+```{r}
+# library(dplyr)
+# 
+# bootstrap_sprint11 <- function(sprint11, n = 10) {
+#   bootstrapped_sprint11s <- lapply(1:n, function(i) {
+#     resampled_counts <- sprint11$sprinter_count[sample(nrow(sprint11), replace = TRUE)]
+#     data.frame(interval = sprint11$interval, sprinter_count = resampled_counts) %>% 
+#       mutate(total = sum(sprinter_count), prop = sprinter_count / total)
+#   })
+#   do.call(rbind, bootstrapped_sprint11s)
+# }
+
+# bootstrapped_sprint11 <- bootstrap_sprint11(sprint11)
+# 
+# bootstrapped_sprint11 <- bootstrapped_sprint11 %>% 
+#   mutate(total_count = ifelse(interval >= 11, sum(sprinter_count[interval >= 11]), sum(sprinter_count[interval < 11])),
+#          percent = sprinter_count / total_count * 100,
+#          category = ifelse(interval >= 11, "Above 11 seconds", "Sub 11 seconds"))
+
+```
+
+#Visualizing
+
+```{r}
+# library(ggplot2)
+# 
+# # Create a bar plot with sprinter count on the y-axis and interval on the x-axis
+# ggplot(bootstrapped_sprint11, aes(x = interval, y = percent, fill = category)) +
+#   geom_col() +
+#   labs(x = "Interval (seconds)", y = "Sprinter percent", fill = "Category") +
+#   ggtitle("Sprinter count per interval")
+
+
+```
+

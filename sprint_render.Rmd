@@ -1,0 +1,21 @@
+---
+title: "sprint_render"
+output: html_document
+date: "2023-02-17"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# create a list of file names
+file_names <- paste0("sprint", 08:19, ".Rmd")
+
+# loop through the list and render each file
+for (file in file_names) {
+  rmarkdown::render(file)
+}
+
+```
+
